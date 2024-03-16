@@ -1,0 +1,12 @@
+version: '2'
+
+services:
+  esphome:
+    image: ghcr.io/esphome/esphome:latest
+    volumes:
+      - ./:/config
+      - /etc/localtime:/etc/localtime:ro
+    devices:
+      - /dev/ttyUSB0
+    privileged: true
+    network_mode: host
