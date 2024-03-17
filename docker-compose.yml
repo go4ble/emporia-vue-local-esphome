@@ -6,7 +6,7 @@ services:
     volumes:
       - ./:/config
       - /etc/localtime:/etc/localtime:ro
-    devices:
-      - /dev/ttyUSB0
+#    devices:
+#      - /dev/ttyUSB0
     privileged: true
     network_mode: host

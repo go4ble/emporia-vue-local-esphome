@@ -26,6 +26,8 @@ api:
         - rtttl.play:
             rtttl: !lambda 'return song_str;'
 
+web_server:
+
 ota:
   # Create a secure password for pushing OTA updates.
   # password: "<secure_password>"
@@ -76,7 +78,7 @@ button:
 
 light:
   - platform: status_led
-    name: "D3_LED"
+    name: "Main Emporia Vue D3_LED"
     pin: 23
     restore_mode: ALWAYS_ON
     entity_category: config
@@ -120,20 +122,20 @@ sensor:
         calibration: 0.022  # 0.022 is used as the default as starting point but may need adjusted to ensure accuracy
         # To calculate new calibration value use the formula <in-use calibration value> * <accurate voltage> / <reporting voltage>
         voltage:
-          name: "Phase A Voltage"
+          name: "Main Phase A Voltage"
           filters: [*throttle_avg, *pos]
         frequency:
-          name: "Phase A Frequency"
+          name: "Main Phase A Frequency"
           filters: [*throttle_avg, *pos]
       - id: phase_b  # Verify that this specific phase/leg is connected to correct input wire color on device listed below
         input: RED  # Vue device wire color
         calibration: 0.022  # 0.022 is used as the default as starting point but may need adjusted to ensure accuracy
         # To calculate new calibration value use the formula <in-use calibration value> * <accurate voltage> / <reporting voltage>
         voltage:
-          name: "Phase B Voltage"
+          name: "Main Phase B Voltage"
           filters: [*throttle_avg, *pos]
         phase_angle:
-          name: "Phase B Phase Angle"
+          name: "Main Phase B Phase Angle"
           filters: [*throttle_avg, *pos]
     ct_clamps:
       # Do not specify a name for any of the power sensors here, only an id. This leaves the power sensors internal to ESPHome.
@@ -150,15 +152,15 @@ sensor:
           id: phase_b_power
           filters: [*pos]
       # Pay close attention to set the phase_id for each breaker by matching it to the phase/leg it connects to in the panel
-      - { phase_id: phase_a, input:  "1", power: { id:  cir1, filters: [ *pos ] } }
-      - { phase_id: phase_a, input:  "2", power: { id:  cir2, filters: [ *pos ] } }
-      - { phase_id: phase_a, input:  "3", power: { id:  cir3, filters: [ *pos ] } }
-      - { phase_id: phase_b, input:  "4", power: { id:  cir4, filters: [ *pos ] } }
-      - { phase_id: phase_a, input:  "5", power: { id:  cir5, filters: [ *pos ] } }
-      - { phase_id: phase_b, input:  "6", power: { id:  cir6, filters: [ *pos ] } }
-      - { phase_id: phase_a, input:  "7", power: { id:  cir7, filters: [ *pos, multiply: 2 ] } }
-      - { phase_id: phase_b, input:  "8", power: { id:  cir8, filters: [ *pos ] } }
-      - { phase_id: phase_b, input:  "9", power: { id:  cir9, filters: [ *pos, multiply: 2 ] } }
+      - { phase_id: phase_a, input:  "1",  power: { id:  cir1, filters: [ *pos ] } }
+      - { phase_id: phase_a, input:  "2",  power: { id:  cir2, filters: [ *pos ] } }
+      - { phase_id: phase_a, input:  "3",  power: { id:  cir3, filters: [ *pos ] } }
+      - { phase_id: phase_b, input:  "4",  power: { id:  cir4, filters: [ *pos ] } }
+      - { phase_id: phase_a, input:  "5",  power: { id:  cir5, filters: [ *pos ] } }
+      - { phase_id: phase_b, input:  "6",  power: { id:  cir6, filters: [ *pos ] } }
+      - { phase_id: phase_a, input:  "7",  power: { id:  cir7, filters: [ *pos, multiply: 2 ] } }
+      - { phase_id: phase_b, input:  "8",  power: { id:  cir8, filters: [ *pos ] } }
+      - { phase_id: phase_b, input:  "9",  power: { id:  cir9, filters: [ *pos, multiply: 2 ] } }
       - { phase_id: phase_b, input: "10", power: { id: cir10, filters: [ *pos, multiply: 2 ] } }
       - { phase_id: phase_a, input: "11", power: { id: cir11, filters: [ *pos ] } }
       - { phase_id: phase_a, input: "12", power: { id: cir12, filters: [ *pos ] } }
@@ -171,26 +173,26 @@ sensor:
         - component.update: total_power
         - component.update: balance_power
   # The copy sensors filter and send the power state to HA
-  - { platform: copy, name: "Phase A Power", source_id: phase_a_power, filters: *throttle_avg }
-  - { platform: copy, name: "Phase B Power", source_id: phase_b_power, filters: *throttle_avg }
-  - { platform: copy, name: "Total Power", source_id: total_power, filters: *throttle_avg }
-  - { platform: copy, name: "Balance Power", source_id: balance_power, filters: *throttle_avg }
-  - { platform: copy, name: "Septic Power", source_id:  cir1, filters: *throttle_avg }
-  - { platform: copy, name: "Garage Power", source_id:  cir2, filters: *throttle_avg }
-  - { platform: copy, name: "Dish Washer Power", source_id:  cir3, filters: *throttle_avg }
-  - { platform: copy, name: "Rec Room Power", source_id:  cir4, filters: *throttle_avg }
-  - { platform: copy, name: "Mech Room Power", source_id:  cir5, filters: *throttle_avg }
-  - { platform: copy, name: "Furnace Power", source_id:  cir6, filters: *throttle_avg }
-  - { platform: copy, name: "In-Floor Heat Power", source_id:  cir7, filters: *throttle_avg }
-  - { platform: copy, name: "Kitchen and Dining Power", source_id:  cir8, filters: *throttle_avg }
-  - { platform: copy, name: "Dryer Power", source_id:  cir9, filters: *throttle_avg }
-  - { platform: copy, name: "A/C Power", source_id: cir10, filters: *throttle_avg }
-  - { platform: copy, name: "Master Bed/Bath Power", source_id: cir11, filters: *throttle_avg }
-  - { platform: copy, name: "Fridge Power", source_id: cir12, filters: *throttle_avg }
-  - { platform: copy, name: "Bidet Power", source_id: cir13, filters: *throttle_avg }
-  - { platform: copy, name: "Kitchen and Pantry Power", source_id: cir14, filters: *throttle_avg }
-  - { platform: copy, name: "Laundry Power", source_id: cir15, filters: *throttle_avg }
-  - { platform: copy, name: "Security Power", source_id: cir16, filters: *throttle_avg }
+  - { platform: copy, name: "Main Phase A Power", source_id: phase_a_power, filters: *throttle_avg }
+  - { platform: copy, name: "Main Phase B Power", source_id: phase_b_power, filters: *throttle_avg }
+  - { platform: copy, name: "Main Total Power", source_id: total_power, filters: *throttle_avg }
+  - { platform: copy, name: "Main Balance Power", source_id: balance_power, filters: *throttle_avg }
+  - { platform: copy, name: "Main 01 Septic Power", source_id:  cir1, filters: *throttle_avg }
+  - { platform: copy, name: "Main 02 Garage Power", source_id:  cir2, filters: *throttle_avg }
+  - { platform: copy, name: "Main 03 Dish Washer Power", source_id:  cir3, filters: *throttle_avg }
+  - { platform: copy, name: "Main 04 Rec Room Power", source_id:  cir4, filters: *throttle_avg }
+  - { platform: copy, name: "Main 05 Mech Room Power", source_id:  cir5, filters: *throttle_avg }
+  - { platform: copy, name: "Main 06 Furnace Power", source_id:  cir6, filters: *throttle_avg }
+  - { platform: copy, name: "Main 07 In-Floor Heat Power", source_id:  cir7, filters: *throttle_avg }
+  - { platform: copy, name: "Main 08 Kitchen and Dining Power", source_id:  cir8, filters: *throttle_avg }
+  - { platform: copy, name: "Main 09 Dryer Power", source_id:  cir9, filters: *throttle_avg }
+  - { platform: copy, name: "Main 10 A/C Power", source_id: cir10, filters: *throttle_avg }
+  - { platform: copy, name: "Main 11 Master Bed/Bath Power", source_id: cir11, filters: *throttle_avg }
+  - { platform: copy, name: "Main 12 Fridge Power", source_id: cir12, filters: *throttle_avg }
+  - { platform: copy, name: "Main 13 Bidet Power", source_id: cir13, filters: *throttle_avg }
+  - { platform: copy, name: "Main 14 Kitchen and Pantry Power", source_id: cir14, filters: *throttle_avg }
+  - { platform: copy, name: "Main 15 Laundry Power", source_id: cir15, filters: *throttle_avg }
+  - { platform: copy, name: "Main 16 Security Power", source_id: cir16, filters: *throttle_avg }
   - platform: template
     lambda: return id(phase_a_power).state + id(phase_b_power).state;
     update_interval: never   # will be updated after all power sensors update via on_update trigger
@@ -199,7 +201,7 @@ sensor:
     state_class: measurement
     unit_of_measurement: "W"
   - platform: total_daily_energy
-    name: "Total Daily Energy"
+    name: "Main Total Daily Energy"
     power_id: total_power
     accuracy_decimals: 0
     restore: false
@@ -229,24 +231,24 @@ sensor:
     state_class: measurement
     unit_of_measurement: "W"
   - platform: total_daily_energy
-    name: "Balance Daily Energy"
+    name: "Main Balance Daily Energy"
     power_id: balance_power
     accuracy_decimals: 0
     restore: false
     filters: *throttle_time
-  - { power_id:  cir1, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Circuit 1 Daily Energy", filters: *throttle_time }
-  - { power_id:  cir2, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Circuit 2 Daily Energy", filters: *throttle_time }
-  - { power_id:  cir3, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Circuit 3 Daily Energy", filters: *throttle_time }
-  - { power_id:  cir4, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Circuit 4 Daily Energy", filters: *throttle_time }
-  - { power_id:  cir5, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Circuit 5 Daily Energy", filters: *throttle_time }
-  - { power_id:  cir6, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Circuit 6 Daily Energy", filters: *throttle_time }
-  - { power_id:  cir7, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Circuit 7 Daily Energy", filters: *throttle_time }
-  - { power_id:  cir8, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Circuit 8 Daily Energy", filters: *throttle_time }
-  - { power_id:  cir9, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Circuit 9 Daily Energy", filters: *throttle_time }
-  - { power_id: cir10, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Circuit 10 Daily Energy", filters: *throttle_time }
-  - { power_id: cir11, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Circuit 11 Daily Energy", filters: *throttle_time }
-  - { power_id: cir12, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Circuit 12 Daily Energy", filters: *throttle_time }
-  - { power_id: cir13, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Circuit 13 Daily Energy", filters: *throttle_time }
-  - { power_id: cir14, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Circuit 14 Daily Energy", filters: *throttle_time }
-  - { power_id: cir15, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Circuit 15 Daily Energy", filters: *throttle_time }
-  - { power_id: cir16, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Circuit 16 Daily Energy", filters: *throttle_time }
+  - { power_id:  cir1, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Main 01 Septic Daily Energy", filters: *throttle_time }
+  - { power_id:  cir2, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Main 02 Garage Daily Energy", filters: *throttle_time }
+  - { power_id:  cir3, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Main 03 Dish Washer Daily Energy", filters: *throttle_time }
+  - { power_id:  cir4, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Main 04 Rec Room Daily Energy", filters: *throttle_time }
+  - { power_id:  cir5, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Main 05 Mech Room Daily Energy", filters: *throttle_time }
+  - { power_id:  cir6, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Main 06 Furnace Daily Energy", filters: *throttle_time }
+  - { power_id:  cir7, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Main 07 In-Floor Heat Daily Energy", filters: *throttle_time }
+  - { power_id:  cir8, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Main 08 Kitchen and Dining Daily Energy", filters: *throttle_time }
+  - { power_id:  cir9, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Main 09 Dryer Daily Energy", filters: *throttle_time }
+  - { power_id: cir10, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Main 10 A/C Daily Energy", filters: *throttle_time }
+  - { power_id: cir11, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Main 11 Master Bed/Bath Daily Energy", filters: *throttle_time }
+  - { power_id: cir12, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Main 12 Fridge Daily Energy", filters: *throttle_time }
+  - { power_id: cir13, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Main 13 Bidet Daily Energy", filters: *throttle_time }
+  - { power_id: cir14, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Main 14 Kitchen and Pantry Daily Energy", filters: *throttle_time }
+  - { power_id: cir15, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Main 15 Laundry Daily Energy", filters: *throttle_time }
+  - { power_id: cir16, platform: total_daily_energy, accuracy_decimals: 0, restore: false, name: "Main 16 Security Daily Energy", filters: *throttle_time }
